@@ -93,6 +93,7 @@ def parseSOScap(url):
 				#
 				new[i]=detailsDict
 		except:
+			new = exceptionHandler(res)
 			pass
 		try:
 			jj = xmltodict.parse(res.text)
@@ -140,6 +141,7 @@ def parseSOScap(url):
 				#				
 				new[i]=detailsDict
 		except:
+			new = exceptionHandler(res)
 			pass
 	#print(Fore.RED+"Some Error in Get Capabilities parsing"+Fore.RESET)
 	elif verify == 'INVALID':
@@ -177,6 +179,46 @@ def verifyGCReq(url):
 	#print (foundThis)
 	return verify
 #-----------------------------------------------------------------------
+def exceptionHandler(res):
+	"""
+	Returns nested dict with exception code and exception text
+	
+	
+	e.g. 
+	uurl = 'http://istsos.org/istsos/demo?request=getCapabilities&section=contents&Service=SOss'
+	uurl2 = 'http://sdf.ndbc.noaa.gov/sos/server.php?request=GetCapabilities&service=Sossasd'	
+	uurl3 = 'http://sdf.ndbc.noaa.gov/sos/server.php?request=GetCapabilitiesasdf&service=Sossasd'
+	
+	"""
+	#err = requests.get(url)
+	er = xmltodict.parse(res.text)
+	erNew = {}
+	try:
+		exceptDict = {}
+		exceptDict['exceptionCode'] = er['ExceptionReport']['Exception']['@exceptionCode']
+		exceptDict['exceptionText'] = er['ExceptionReport']['Exception']['ExceptionText']
+		erNew[0] = exceptDict
+	except:
+		pass
+
+	try:
+		manyEcpt = er['ows:ExceptionReport']['ows:Exception'] # multiple exceptions
+		if type(manyEcpt) is list:#to verify whether it is list
+			for i in range(len(manyEcpt)):
+				exceptDict = {}
+				exceptDict['exceptionCode'] = manyEcpt[i]['@exceptionCode'] # Note no exception text
+				exceptDict['exceptionText'] = 'None'# no exception text here
+				erNew[i] = exceptDict
+		else:
+			exceptDict = {}
+			exceptDict['exceptionCode'] = manyEcpt['@exceptionCode']
+			exceptDict['exceptionText'] = manyEcpt['ows:ExceptionText']
+			erNew[0] = exceptDict
+	except:
+		pass
+	return(erNew)
+#-----------------------------------------------------------------------
+
 # implementation
 
 # To do
