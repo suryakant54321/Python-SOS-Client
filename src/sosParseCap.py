@@ -7,6 +7,11 @@
 # Tested on: 
 # 1. National Data Buoy Center SOS  (http://sdf.ndbc.noaa.gov/sos/server.php)
 # 2. ISTSOS Demo SOS (http://istsos.org/istsos/demo)
+#
+# To Do: Extract following from GetCapabilities Response
+# 1. ServiceIdentification
+# 2. ServiceProvider
+# 3. OperationsMetadata
 #-----------------------------------------------------------------------
 """
 import re, os, fnmatch, time, datetime
@@ -93,7 +98,7 @@ def parseSOScap(url):
 				#
 				new[i]=detailsDict
 		except:
-			new = exceptionHandler(res)
+			#new = exceptionHandler(res)
 			pass
 		try:
 			jj = xmltodict.parse(res.text)
@@ -141,7 +146,7 @@ def parseSOScap(url):
 				#				
 				new[i]=detailsDict
 		except:
-			new = exceptionHandler(res)
+			#new = exceptionHandler(res)
 			pass
 	#print(Fore.RED+"Some Error in Get Capabilities parsing"+Fore.RESET)
 	elif verify == 'INVALID':
@@ -183,7 +188,6 @@ def exceptionHandler(res):
 	"""
 	Returns nested dict with exception code and exception text
 	
-	
 	e.g. 
 	uurl = 'http://istsos.org/istsos/demo?request=getCapabilities&section=contents&Service=SOss'
 	uurl2 = 'http://sdf.ndbc.noaa.gov/sos/server.php?request=GetCapabilities&service=Sossasd'	
@@ -218,23 +222,14 @@ def exceptionHandler(res):
 		pass
 	return(erNew)
 #-----------------------------------------------------------------------
-
 # implementation
-
 # To do
 # 1. Push data through Telegram Bot
 # 2. Check feasibility for localhost
-
-#Approach 3
-# List of things I need from Get Observation Request
- 
 url = 'http://istsos.org/istsos/demo?request=getCapabilities&section=contents&service=SOS'
 url2 = 'http://sdf.ndbc.noaa.gov/sos/server.php?request=GetCapabilities&service=SOS' 
-
 #details = parseSOScap(url)
-#print(details)
-
-    
-
-
+#print(len(details))
+#details = parseSOScap(url2)
+#print(len(details))
 
