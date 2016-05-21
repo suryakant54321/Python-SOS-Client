@@ -206,11 +206,11 @@ def parseSOSgetObs(url, rparams, responseFormat='None'):
 			(e.g. "http://istsos.org/istsos/demo")
 
 		rparams {dict} request parameters
-			(e.g. ISTSOSrparams = {"service": "SOS",\
-		 		"offering": "BELLINZONA",\
-		 		"request": "GetObservation",\
-		 		"version": "1.0.0",\
-		 		"observedProperty": "air:temperature",\
+			(e.g. ISTSOSrparams = {"service": "SOS",\n
+		 		"offering": "BELLINZONA",\n
+		 		"request": "GetObservation",\n
+		 		"version": "1.0.0",\n
+		 		"observedProperty": "air:temperature",\n
 		 		"procedure": "BELLINZONA"})
 		
 		responseFormat [str] response format 
@@ -257,7 +257,9 @@ def parseSOSgetObs(url, rparams, responseFormat='None'):
 	return(senDetails, tSeriesObs)
 #-----------------------------------------------------------------------
 # Implementation
+# 1. NDBC
 # e.g. URL's
+# NDBC Ex 1
 ndbcGO = "http://sdf.ndbc.noaa.gov/sos/server.php"
 # XML
 NDBCxml = "http://sdf.ndbc.noaa.gov/sos/server.php?request=GetObservation&service=SOS&version=1.0.0&offering=urn:ioos:station:wmo:41063&procedure=urn:ioos:station:wmo:41063&eventTime=2014-04-30T07:00:00Z/2014-05-30T07:00:00Z&observedProperty=air_temperature&responseFormat=text/xml;subtype=%22om/1.0.0%22"
@@ -281,8 +283,21 @@ NDBCendDate = "2014-05-30T07:00:00Z"
 #NDBCendDate = datetime.datetime(2014,05,07,20,30,0, tzinfo=timezone('UTC')).strftime('%Y-%m-%dT%H:%M:%S%z')
 #
 NDBCrparams['eventTime'] = str(NDBCstartDate) + "/" +str(NDBCendDate) # observations from start date to end date
-#
-# ISTSOS
+#---
+# NDBC Ex 2
+NDBCparams2 = "http://sdf.ndbc.noaa.gov/sos/server.php?request=GetObservation&service=SOS&version=1.0.0&offering=urn:ioos:station:wmo:41012&observedproperty=air_pressure_at_sea_level&responseformat=text/csv&eventtime=2014-02-10T12:50:00Z/2014-02-19T12:50:00Z"
+NDBCrparams2 = {"service": "SOS",\
+		 "offering": "urn:ioos:station:wmo:41012",\
+		 "request": "GetObservation",\
+		 "version": "1.0.0",\
+		 "observedProperty": "air_pressure_at_sea_level",\
+		 "procedure": "urn:ioos:station:wmo:41012"}
+NDBCstartDate2 = "2014-02-10T12:50:00Z"
+NDBCendDate2 = "2014-02-19T12:50:00Z"
+NDBCrparams2['eventTime'] = str(NDBCstartDate2) + "/" +str(NDBCendDate2) # observations from start date to end date
+#-----------------------------------------------------------------------
+# 2. ISTSOS
+# ISTSOS Ex 1
 istsosGO = "http://istsos.org/istsos/demo"
 # JSON
 istsosJSON = "http://istsos.org/istsos/demo?service=SOS&version=1.0.0&request=GetObservation&offering=BELLINZONA&procedure=urn:ogc:def:procedure:x-istsos:1.0:BELLINZONA&eventTime=2014-05-03T16:30:00+02:00/2014-05-04T16:30:00+02:00&observedProperty=urn:ogc:def:parameter:x-istsos:1.0:meteo:air:temperature&responseFormat=application/json"
@@ -299,6 +314,8 @@ ISTSOSrparams = {"service": "SOS",\
 		 "observedProperty": "air:temperature",\
 		 "procedure": "BELLINZONA"}
 ISTSOSrparams['eventTime'] = str(startDate) + "/" +str(endDate) # observations from start date to end date
+# ISTSOS Ex 2
+
 """
 #
 print('ISTSOS Request 1')
@@ -314,6 +331,12 @@ print(len(bb))
 print('NDBC Request 1')	
 print(NDBCrparams)
 aa, bb = parseSOSgetObs(ndbcGO, NDBCrparams, responseFormat='csv')
+print(aa)
+print(len(bb))
+#
+print('NDBC Request 2')	
+print(NDBCrparams2)
+aa, bb = parseSOSgetObs(ndbcGO, NDBCrparams2, responseFormat='csv')
 print(aa)
 print(len(bb))
 """
