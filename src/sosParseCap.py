@@ -7,6 +7,7 @@
 # Tested on: 
 # 1. National Data Buoy Center SOS  (http://sdf.ndbc.noaa.gov/sos/server.php)
 # 2. ISTSOS Demo SOS (http://istsos.org/istsos/demo)
+# 3. ISTSOS installed on WSN (http://localhost/istsos/service)
 #
 # To Do: Extract following from GetCapabilities Response
 # 1. ServiceIdentification
@@ -50,7 +51,6 @@ def parseSOScap(url):
 				e.g. {u'urn:ogc:def:procedure:x-istsos:1.0:BELLINZONA', ...}
 
 	Note: 	1. output may contain mupltiple nested dictionaries
-		2. Not tested with http://localhost/service
 	"""
 	new = {} # e.g. detailsDict['water']=100
 	# import request class

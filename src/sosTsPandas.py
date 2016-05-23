@@ -42,13 +42,12 @@ def tsOperation(message, data, operation='mean', sampleTime='24H'):
 		#print(df.resample(sampleTime, how = operation))
 		#
 		meanTs = df.resample(sampleTime, how = operation) # mean of selected time series
-		meanTsCsv = meanTs.to_csv()
+		meanTsCsv = meanTs.to_csv(columns=['val'])
 		meanTsCsv = meanTsCsv.rstrip('\n') 
 		meanTsList = re.split(',|\\n',meanTsCsv)
 		#
 		# using splitLst function to split list
 		meanTsList = splitLst(meanTsList, int(len(meanTsList)/2))
-		#
 	else:
 		print(Fore.RED+"invalid operation '"+operation+"' \n Returning empty list \n current support limited to mean, median, max, min and sum."+Fore.RESET)
 	return(meanTsList)
@@ -75,12 +74,16 @@ print(message)
 print(len(data))
 result = tsOperation(message, data, operation='mean', sampleTime='24H')
 print(result)
+result = tsOperation(message, data, operation='max', sampleTime='24H')
+print(result)
 print("--------------------------------------------------------------------------------")
 # get observation from web URL
 message, data = go.parseSOSgetObs(go.istsosGO, go.ISTSOSrparams, responseFormat='JSON') 
 print(message)
 print(len(data))
 result = tsOperation(message, data, operation='mean', sampleTime='24H')
+print(result)
+result = tsOperation(message, data, operation='min', sampleTime='24H')
 print(result)
 print("--------------------------------------------------------------------------------")
 # get observation from web URL
@@ -89,12 +92,16 @@ print(message)
 print(len(data))
 result = tsOperation(message, data, operation='mean', sampleTime='24H')
 print(result)
+result = tsOperation(message, data, operation='median', sampleTime='24H')
+print(result)
 print("--------------------------------------------------------------------------------")
 # get observation from web URL
 message, data = go.parseSOSgetObs(go.ndbcGO, go.NDBCrparams2, responseFormat='csv')
 print(message)
 print(len(data))
 result = tsOperation(message, data, operation='mean', sampleTime='24H')
+print(result)
+result = tsOperation(message, data, operation='sum', sampleTime='24H')
 print(result)
 #
 """

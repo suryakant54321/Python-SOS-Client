@@ -7,6 +7,7 @@
 # Tested on: 
 # 1. National Data Buoy Center SOS  (http://sdf.ndbc.noaa.gov/sos/server.php)
 # 2. ISTSOS Demo SOS (http://istsos.org/istsos/demo)
+# 3. ISTSOS localhost (http://localhost/istsos/service)
 #-----------------------------------------------------------------------
 """
 import re, os, fnmatch, time, datetime
@@ -51,7 +52,6 @@ def parseSOSDSensor(url):
 		9. sml:history
 		
 	Note: 	1. output may contain mupltiple nested dictionaries
-		2. Not tested with http://localhost/service
 	"""
 	new = {}
 	# import request class
@@ -72,7 +72,10 @@ def parseSOSDSensor(url):
 			detailsDict['sensorName'] = jj['sml:SensorML']['sml:member']['sml:System']['gml:name']
 			# Identification 
 			#detailsDict['sensorIdentificationDef'] = jj['sml:SensorML']['sml:member']['sml:System']['sml:identification']['sml:IdentifierList']['sml:identifier']['sml:Term']['@definition']
-			detailsDict['sensorIdentification'] = jj['sml:SensorML']['sml:member']['sml:System']['sml:identification']['sml:IdentifierList']['sml:identifier']['sml:Term']['sml:value']
+			try:
+				detailsDict['sensorIdentification'] = jj['sml:SensorML']['sml:member']['sml:System']['sml:identification']['sml:IdentifierList']['sml:identifier']['sml:Term']['sml:value']
+			except:
+				pass
 			# list of sensor classification
 			sClass = jj['sml:SensorML']['sml:member']['sml:System']['sml:classification']['sml:ClassifierList']['sml:classifier']
 			cl = {}

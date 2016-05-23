@@ -7,6 +7,7 @@
 # Tested on: 
 # 1. National Data Buoy Center SOS  (http://sdf.ndbc.noaa.gov/sos/server.php)
 # 2. ISTSOS Demo SOS (http://istsos.org/istsos/demo)
+# 3. ISTSOS localhost (http://localhost/istsos/service)
 # 
 # To Do: 
 #	1. Add verification for request keys
@@ -35,8 +36,6 @@ def parseJSONresponse(res):
 		1. nested list time series
 
 		2. sensor details dict
-		
-	Note: 	1. Not tested with http://localhost/service
 	"""
 	senDet = {}
 	sTSobs = []
