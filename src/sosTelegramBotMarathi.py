@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 #-----------------------------------------------------------------------
 # Source Details: https://github.com/python-telegram-bot/python-telegram-bot/examples
