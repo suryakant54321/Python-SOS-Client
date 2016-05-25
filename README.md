@@ -3,10 +3,11 @@ Python Sensor Observation Service (SOS) Cilent
 
 - Python based parsers for parsing SOS response.
 - Aimed for standalone operation mainly for SOS based Telegram Bot/s.
+- Integrates SOS parsers using [Telegram-Bot-Scripts] to [python-telegram-bot]. More information about [Telegram Bot Platform].
 
 
 ### Version
-Alpha 0.0.1
+Alpha 1.0.0
 
 ### Depends on
 
@@ -31,8 +32,13 @@ Only tested in Ubuntu 14.04 with python 2.7
 
 1. Folder: src
 	- sosParseCap.py (SOS GetCapability parser)
-	- sosReq.py (SOS Get Observation requests and response parser/s)
+	- sosReq.py (SOS Get Observation requests and response parser example)
 	- sosTsPandas.py (SOS time series analysis using Pandas )
+	- sosParseDSensor.py (SOS Describe sensor parser)
+	- sosParseGetObs.py (SOS Get Observation parser)
+	- sosTelegramBot.py (SOS integration with Telegram Bot, example1: English)
+	- sosTelegramBotMarathi.py (SOS integration with Telegram Bot, example2: English and Marathi)
+	- overallFlow.py (overall flow of all processes)
 
 ### Advantages
 
@@ -40,7 +46,7 @@ Only tested in Ubuntu 14.04 with python 2.7
 
 ### Limitations
 
-	1. Some sections are hardcoaded.
+	1. Some sections are hardcoaded in SOS response parsers.
 	
 ### Installation
 
@@ -84,13 +90,11 @@ C. Other SOS Clients
 
 #### To Do
 	
-1. Write parser for SOS describe sensor and get observation request
+1. Combine overall flow of all processes (i.e. SOS parsing and Telegram user interactions)
 
-2. Integrate parsers using [Telegram-Bot-Scripts] to [python-telegram-bot]. More information about [Telegram Bot Platform]. 
+2. Test all modules
 
-3. Test all modules
-
-4. Write detailed documentation using [Sphinix] 
+3. Write detailed documentation using [Sphinix] 
 
 
 [ISTSOS]: <http://istsos.org/>

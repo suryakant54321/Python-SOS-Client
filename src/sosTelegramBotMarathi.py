@@ -39,7 +39,10 @@ def help(bot, update):
 	bot.sendMessage(update.message.chat_id, text='For more information enter following commands \n अधिक माहितीसाठी खाली दिलॆलॆ मेसेज पाठवा \n /whoami (मी कॊण आहॆ?) \n /getSOSUrls (हवामान केंद्राचे दुवॆ मीळवा.) \n /ISTSOSCap (हवामान केंद्राची अधिक माहिती.)')
 #
 def whoami(bot, update):
-	bot.sendMessage(update.message.chat_id, text='I am Telegram based Sensor Observation Service Bot. \n मी  Telegram  मधॆ तयार कॆलॆला रोबोट आहे. \n मी तुम्हाला हवामान केंद्राची माहीति मिळवण्यासाठी मदत करॆन. \n अधिक माहितीसाठी /help मेसेज पाठवा')
+	bot.sendMessage(update.message.chat_id, text='I am Telegram based Sensor Observation Service Bot. \n मी  Telegram  मधॆ तयार कॆलॆला रोबोट आहे. \n मी तुम्हाला हवामान केंद्राची माहीति मिळवण्यासाठी मदत करॆन. \n अधिक माहितीसाठी /morewhoami मेसेज पाठवा')
+#
+def morewhoami(bot, update):
+	bot.sendMessage(update.message.chat_id, text='Designed By: Suryakant Sawant (PhD Research Scholar, IIT Bombay). \n email: suryakant54321@gmail.com \n For more information send (अधिक माहितीसाठी) /help (मेसेज पाठवा)')
 #
 def getSOSUrls(bot, update):
 	bot.sendMessage(update.message.chat_id, text="I have \n 1. ISTSOS [http://istsos.org/istsos/demo] \n 2. NDBC [http://sdf.ndbc.noaa.gov/sos/server.php] \n")
@@ -62,9 +65,26 @@ def getObs(bot, update):
 	bot.sendMessage(update.message.chat_id, text=out)
 #
 def echo(bot, update):
-	print(update.message.text)
-	# to capture user input without command
-	da = ("I don't understand what ' %s ' means :) \n enter /help for more info.")%(update.message.text)
+	#print(update.message)
+	dat = update.message
+	dat = dat.to_dict()
+	print(dat)
+	f_name = dat['from']['first_name']
+	# Form reply message
+	da = ("%s I don't understand what ' %s ' means :) \n enter /help for more info.")%(f_name, update.message.text)
+	bot.sendMessage(update.message.chat_id, text=da)
+#
+def loc(bot, update):
+	#print(update.message)
+	dat = update.message
+	dat = dat.to_dict()
+	print(dat)
+	f_name = dat['from']['first_name']
+	# another quick way to know the location id's
+	lat = dat['location']['latitude']
+	lon = dat['location']['longitude']
+	# Form reply message
+	da = ("%s you are located at \n Lat: %s , Lon = %s ")%(f_name, str(lat), str(lon))
 	bot.sendMessage(update.message.chat_id, text=da)
 #
 def error(bot, update, error):
@@ -72,7 +92,7 @@ def error(bot, update, error):
 #
 def main():
 	# Add your bot's token here
-	updater = Updater("TOKEN")
+	updater = Updater("176491696:AAH1dISmGvlimMdiNpnfTxXso0w9hXwncAs")
 
 	# Get the dispatcher to register handlers
 	dp = updater.dispatcher
@@ -81,13 +101,14 @@ def main():
 	dp.add_handler(CommandHandler("start", start))
 	dp.add_handler(CommandHandler("help", help))
 	dp.add_handler(CommandHandler("whoami", whoami))
+	dp.add_handler(CommandHandler("morewhoami", morewhoami))
 	dp.add_handler(CommandHandler("getSOSUrls", getSOSUrls))
 	dp.add_handler(CommandHandler("ISTSOSCap", ISTSOSCap))
 	dp.add_handler(CommandHandler("getObs", getObs))
 
 	# on noncommand i.e message - echo the message on Telegram
 	dp.add_handler(MessageHandler([Filters.text], echo))
-	
+	dp.add_handler(MessageHandler([Filters.location], loc))
 	# log all errors
 	dp.add_error_handler(error)
 
