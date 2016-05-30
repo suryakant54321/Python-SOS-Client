@@ -65,12 +65,41 @@ def echo(bot, update):
 	da = ("I don't understand what ' %s ' means :) \n enter /help for more info.")%(update.message.text)
 	bot.sendMessage(update.message.chat_id, text=da)
 #
+def loc(bot, update):
+	#print(update.message)
+	dat = update.message
+	dat = dat.to_dict()
+	print(dat)
+	f_name = dat['from']['first_name']
+	# another quick way to know the location id's
+	lat = dat['location']['latitude']
+	lon = dat['location']['longitude']
+	# Form reply message
+	da = ("%s you are located at \n Lat: %s , Lon = %s ")%(f_name, str(lat), str(lon))
+	bot.sendMessage(update.message.chat_id, text=da)
+#
+def pic(bot, update):
+	#print(update.message)
+	dat = update.message
+	dat = dat.to_dict()
+	print(dat)
+	f_name = dat['from']['first_name']
+	# Form reply message
+	da = ("%s image is received from you.\n We will come back to you soon with results/forward image to expert.")%(f_name)
+	bot.sendMessage(update.message.chat_id, text=da)
+	'''
+	# Help
+	f_id = jj.to_dict()['message']['photo'][0]['file_id']#put photo identifier 0=small, 1=medium, 2=original
+	newFile = bot.getFile(f_id)
+	newFile.download('File_path\\file4.jpg')
+	'''
+# 
 def error(bot, update, error):
 	logger.warn('Update "%s" caused error "%s"' % (update, error))
 #
 def main():
-	# Add your bot's token here
-	updater = Updater("TOKEN")
+	# Add your bot's token here # KrishiSense: 176491696:AAH1dISmGvlimMdiNpnfTxXso0w9hXwncAs
+	updater = Updater("TOKEN") # SenseTube: 
 
 	# Get the dispatcher to register handlers
 	dp = updater.dispatcher
@@ -85,6 +114,8 @@ def main():
 
 	# on noncommand i.e message - echo the message on Telegram
 	dp.add_handler(MessageHandler([Filters.text], echo))
+	dp.add_handler(MessageHandler([Filters.location], loc))
+	dp.add_handler(MessageHandler([Filters.photo], pic))
 	
 	# log all errors
 	dp.add_error_handler(error)
