@@ -98,8 +98,8 @@ def error(bot, update, error):
 	logger.warn('Update "%s" caused error "%s"' % (update, error))
 #
 def main():
-	# Add your bot's token here # KrishiSense: 176491696:AAH1dISmGvlimMdiNpnfTxXso0w9hXwncAs
-	updater = Updater("TOKEN") # SenseTube: 
+	# Add your bot's token here 
+	updater = Updater("TOKEN") 
 
 	# Get the dispatcher to register handlers
 	dp = updater.dispatcher
