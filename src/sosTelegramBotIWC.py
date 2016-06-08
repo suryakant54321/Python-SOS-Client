@@ -27,8 +27,9 @@
 #-----------------------------------------------------------------------
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
-import datetime
+import datetime, re, os
 import dateutil
+import csv
 #-----------------------------------------------------------------------
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.INFO)
@@ -47,7 +48,7 @@ def whoami(bot, update):
 	bot.sendMessage(update.message.chat_id, text=msgCont)
 # 3
 def morewhoami(bot, update):
-	msgCont = 'Location of AWS (हवामान केंद्राचे ठीकान)  \n Village (गाव): Bargaon (बारगाव), \n Tahsil (तालुका): Warud (वरुड), \n Dist (जिल्हा): Amravati (अमरावती), \n Designed By: Suryakant Sawant (PhD Research Scholar, IIT Bombay). \n email: suryakant54321@gmail.com \n To return send (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा.)'
+	msgCont = u"कृषीसेन्स (KrishiSense) हा Telegram bot प्रायोगिक तत्वावर फक्त ITRA Water प्रोजेक्ट साठी बनवण्यात आलेला आहे. \n KrishiSense Telegram bot is designed specifically for ITRA Water project. \n सुरुवातीच्या काही महिन्यांमध्ये हा bot सतत बदलत आहे. काही कारणास्तव त्रुटी किवा चुकीची माहिती प्रसारित करण्याची शक्यता आहे. \n This bot is under test for few months and there is possibility of wrong results. \n ----- \n आपल्या शंका कींवा प्रश्न /query 'आपली शंका' लिहून पाठवू शकता. \n Users are requested to submit their questions or concerns on chat window using /query 'your query'. \n ----- \n Location of AWS (हवामान केंद्राचे ठीकान)  \n Village (गाव): Bargaon (बारगाव), \n Tahsil (तालुका): Warud (वरुड), \n Dist (जिल्हा): Amravati (अमरावती), \n ----- \n Designed By: Suryakant Sawant (PhD Research Scholar, IIT Bombay). \n email: suryakant54321@gmail.com \n To return send (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा.)"
 	bot.sendMessage(update.message.chat_id, text=msgCont)
 # 4
 def whichSensors(bot, update):
@@ -174,6 +175,41 @@ def getRain(bot, update):
 		msgOut = msgOut + "Some problem (काही अंतर्गत समस्या)\n Retry after some time (काही वेळानंतर पुन्हा प्रयत्न करा)."
 	msgOut = msgOut + '\n To return send (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा.)'
 	bot.sendMessage(update.message.chat_id, text=msgOut)
+# 10
+def query(bot, update):
+	dat = update.message
+	dat = dat.to_dict()
+	print(dat)
+	f_name = dat['from']['first_name']
+	l_name = dat['from']['last_name']
+	queryText = dat['text']
+	print(queryText)
+	qDate = datetime.datetime.fromtimestamp(dat['date'])
+	qDate = qDate.strftime('%Y-%m-%dT%H:%M:%S')
+	queryContent = re.split('/query',queryText)
+	spaces = queryContent[1].replace(' ','')
+	if queryContent[1] == u'' or spaces == u'':
+		da = (u"Dear %s we received query without content. \n नमस्कार %s आपल्या शंका कींवा प्रश्नाचा मुद्दा रीकामा आहे. \n ---- \n Right format /query your text (यॊग्य मुद्दा प्रकार  /query आपला मुद्दा ).")%(f_name, f_name)
+	else:
+		da = (u"Dear %s we received your query: \n '%s'. \n नमस्कार %s आपली शंका कींवा प्रश्न मिळाला: \n '%s') \n To return send (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा).")%(f_name, update.message.text, f_name, update.message.text)
+		content = {}
+		content['det']=[]
+		allContent = qDate+', '+f_name+' '+l_name+', '
+		content['det'].append(allContent)
+		content['text']=[]
+		content['text'].append(queryContent[1])
+		# write file with user details
+		writeContent(fName, content)
+	bot.sendMessage(update.message.chat_id, text=da)
+#
+# Write utf-8 file content
+def writeContent(fName, content):
+	with open(fName,'a') as fout:
+    		writer = csv.writer(fout)    
+    		for row in zip(*content.values()):
+			row=[s.encode('utf-8') for s in row]
+			writer.writerows([row])
+	fout.close()
 #---------------------------------------------------------------------------------
 # a
 def echo(bot, update):
@@ -183,7 +219,7 @@ def echo(bot, update):
 	print(dat)
 	f_name = dat['from']['first_name']
 	# Form reply message
-	da = ("%s I don't understand what ' %s ' means. \n %s मला समजलॆ नाही, ' %s ' आपण काय सांगू इच्छित आहात? )  \n To return send (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा).")%(f_name, update.message.text, f_name, update.message.text)
+	da = (u"%s I don't understand what ' %s ' means. \n %s मला समजलॆ नाही, ' %s ' आपण काय सांगू इच्छित आहात? )  \n To return send (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा).")%(f_name, update.message.text, f_name, update.message.text)
 	bot.sendMessage(update.message.chat_id, text=da)
 # b
 def loc(bot, update):
@@ -196,7 +232,7 @@ def loc(bot, update):
 	lat = dat['location']['latitude']
 	lon = dat['location']['longitude']
 	# Form reply message
-	da = ("%s You are located at (आपण येथे आहात) \n Lat (अक्षांश): %s , Lon (रेखांश) = %s ")%(f_name, str(lat), str(lon))
+	da = (u"%s You are located at (आपण येथे आहात) \n Lat (अक्षांश): %s , Lon (रेखांश) = %s ")%(f_name, str(lat), str(lon))
 	bot.sendMessage(update.message.chat_id, text=da)
 # c
 def pic(bot, update):
@@ -222,8 +258,9 @@ def error(bot, update, error):
 def main():
 	# Add your bot's token here
 	updater = Updater("TOKEN")
-	global url
+	global url, fName
 	url = 'http://localhost/istsos/service'
+	fName = 'userQuery.csv'# File to store user queries
 	# Get the dispatcher to register handlers
 	dp = updater.dispatcher
 
@@ -241,6 +278,9 @@ def main():
 	dp.add_handler(CommandHandler("getTemp", getTemp))# Get temperature sensor data # 7
 	dp.add_handler(CommandHandler("getHum", getHum))# Get humidity sensor data # 8
 	dp.add_handler(CommandHandler("getRain", getRain))# Get rainfall sensor data # 9
+	
+	dp.add_handler(CommandHandler("query", query))# Sending user query # 10
+
 	# to do add getET, irriSchedule,
 
 	# on noncommand i.e message - echo the message on Telegram
