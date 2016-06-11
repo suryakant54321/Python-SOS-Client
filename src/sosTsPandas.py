@@ -31,7 +31,7 @@ def tsOperation(message, data, operation='mean', sampleTime='24H'):
 		1. List output of time series operation
 			e.g. [['dateTime', 'val'], ['2014-05-03 16:00:00', '19.275'], ...]
 	"""
-	operationSupport = ['sum', 'mean', 'max', 'median', 'min']
+	operationSupport = ['sum', 'mean', 'max', 'median', 'min', 'count']
 	meanTsList = []
 	if operation.lower() in operationSupport: 
 		df = pd.DataFrame(data, columns=["dateTime", "val"]) # create dataframe
@@ -40,8 +40,12 @@ def tsOperation(message, data, operation='mean', sampleTime='24H'):
 		df['val'] = df.val.convert_objects(convert_numeric=True) # convert data type of temp column to numeric
 		#print(df.dtypes)# data type of dataframe varaibles
 		#print(df.resample(sampleTime, how = operation))
-		#
-		meanTs = df.resample(sampleTime, how = operation) # mean of selected time series
+		# perform operation on selected time series
+		if operation=='count' or operation=='mean':
+			df = df.loc[(df.val!=0)]
+			meanTs = df.resample(sampleTime, how = operation) 
+		else:
+			meanTs = df.resample(sampleTime, how = operation)
 		meanTsCsv = meanTs.to_csv(columns=['val'])
 		meanTsCsv = meanTsCsv.rstrip('\n') 
 		meanTsList = re.split(',|\\n',meanTsCsv)
@@ -49,7 +53,7 @@ def tsOperation(message, data, operation='mean', sampleTime='24H'):
 		# using splitLst function to split list
 		meanTsList = splitLst(meanTsList, int(len(meanTsList)/2))
 	else:
-		print(Fore.RED+"invalid operation '"+operation+"' \n Returning empty list \n current support limited to mean, median, max, min and sum."+Fore.RESET)
+		print(Fore.RED+"invalid operation '"+operation+"' \n Returning empty list \n current support limited to mean, median, max, min, sum and count."+Fore.RESET)
 	return(meanTsList)
 #-----------------------------------------------------------------------
 def splitLst(splitL, lRank):

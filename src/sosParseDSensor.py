@@ -206,6 +206,8 @@ ndbc1 = "http://sdf.ndbc.noaa.gov/sos/server.php?request=DescribeSensor&service=
 #ndbc2 = "http://sdf.ndbc.noaa.gov/sos/server.php?request=DescribeSensor&service=SOS&procedure=urn:ioos:station:wmo:21346&outputFormat=text/xml%3Bsubtype=%22sensorML/1.0.1%22&version=1.0.0"
 #istsos1 = "http://istsos.org/istsos/demo?request=DescribeSensor&service=SOS&procedure=urn:ogc:def:procedure:x-istsos:1.0:GRABOW&outputFormat=text/xml;subtype=%22sensorML/1.0.1%22&version=1.0.0"
 istsos2 = "http://istsos.org/istsos/demo?request=DescribeSensor&service=SOS&procedure=urn:ogc:def:procedure:x-istsos:1.0:GRABOW&outputFormat=text/xml%3Bsubtype=%22sensorML/1.0.1%22&version=1.0.0"
+# for istsos v 1.0
+istsos3 = "http://localhost/istsos/service?request=DescribeSensor&service=SOS&procedure=urn:ogc:def:procedure:x-istsos:1.0:wind_speed_1&responseFormat=text/xml;subtype=%27sensorML/1.0.0%27&version=1.0.0"
 #details = parseSOSDSensor(istsos2)
 #print(details)
 #details = parseSOSDSensor(ndbc1)

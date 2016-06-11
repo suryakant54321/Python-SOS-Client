@@ -74,7 +74,7 @@ def getObs(bot, update):
 # 7
 def getTemp(bot, update):
 	import sosParseCap as pc
-	nUrl = url+'?request=getCapabilities&section=contents&service=SOS'
+	nUrl = url+getCapStr
 	out = pc.parseSOScap(nUrl)
 	out = out[0]
 	obsProp = out['observedProperties'][0]
@@ -109,7 +109,7 @@ def getTemp(bot, update):
 # 8
 def getHum(bot, update):
 	import sosParseCap as pc
-	nUrl = url+'?request=getCapabilities&section=contents&service=SOS'
+	nUrl = url+getCapStr
 	out = pc.parseSOScap(nUrl)
 	out = out[0]
 	obsProp = out['observedProperties'][3]
@@ -144,7 +144,7 @@ def getHum(bot, update):
 # 9
 def getRain(bot, update):
 	import sosParseCap as pc
-	nUrl = url+'?request=getCapabilities&section=contents&service=SOS'
+	nUrl = url+getCapStr
 	out = pc.parseSOScap(nUrl)
 	out = out[0]
 	obsProp = out['observedProperties'][4]
@@ -254,13 +254,20 @@ def pic(bot, update):
 def error(bot, update, error):
 	logger.warn('Update "%s" caused error "%s"' % (update, error))
 #---------------------------------------------------------------------------------
+# TODO: add function to process Reference Evapotranspiration ETo
+
+#---------------------------------------------------------------------------------
 #
 def main():
 	# Add your bot's token here
 	updater = Updater("TOKEN")
-	global url, fName
+	global url, fName, getCapStr
 	url = 'http://localhost/istsos/service'
-	fName = 'userQuery.csv'# File to store user queries
+	# File to store user queries 
+	fName = 'userQuery.csv'
+	#TODO: 	Store user queries to database
+	# Get capabilities string
+	getCapStr = '?request=getCapabilities&section=contents&service=SOS'
 	# Get the dispatcher to register handlers
 	dp = updater.dispatcher
 
@@ -272,14 +279,17 @@ def main():
 	
 	dp.add_handler(CommandHandler("whichSensors", whichSensors)) #4
 
-	dp.add_handler(CommandHandler("ISTSOSCap", ISTSOSCap)) # 5
-	dp.add_handler(CommandHandler("getObs", getObs)) # 6
-	
-	dp.add_handler(CommandHandler("getTemp", getTemp))# Get temperature sensor data # 7
-	dp.add_handler(CommandHandler("getHum", getHum))# Get humidity sensor data # 8
-	dp.add_handler(CommandHandler("getRain", getRain))# Get rainfall sensor data # 9
-	
-	dp.add_handler(CommandHandler("query", query))# Sending user query # 10
+	dp.add_handler(CommandHandler("ISTSOSCap", ISTSOSCap)) # 5 not used here
+	dp.add_handler(CommandHandler("getObs", getObs)) # 6 not used here
+	# Get temperature sensor data # 7	
+	dp.add_handler(CommandHandler("getTemp", getTemp))
+	# Get humidity sensor data # 8
+	dp.add_handler(CommandHandler("getHum", getHum))
+	# Get rainfall sensor data # 9
+	dp.add_handler(CommandHandler("getRain", getRain))
+	# Sending user query # 10
+	dp.add_handler(CommandHandler("query", query))
+
 
 	# to do add getET, irriSchedule,
 
@@ -298,7 +308,7 @@ def main():
 	# SIGTERM or SIGABRT. This should be used most of the time, since
 	# start_polling() is non-blocking and will stop the bot gracefully.
 	updater.idle()
-
+#---------------------------------------------------------------------------------
 if __name__ == '__main__':
 	main()
 #
