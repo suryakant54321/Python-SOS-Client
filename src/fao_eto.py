@@ -236,6 +236,8 @@ __version__ = "1.2.0"
 __date__ = "11/06/16"
 
 import math
+import datetime
+import dateutil
 # Global constants
 PI = 3.14159265
 #
@@ -392,15 +394,6 @@ def ea_from_tmin(tmin):
 	ea = 0.611 * math.exp((17.27 * tmin)/(tmin + 237.3))
 	return ea
 #
-# Written by : Suryakant Sawant
-# Verified
-def sat_vap_press(temp):
-	"""
-	Calculates saturated vapour pressure.
-	"""
-	e_temp = 0.6108 * math.exp((17.27*temp)/(temp+237.3))
-	return e_temp
-# 
 # Verified
 def ea_from_rhmin_rhmax(e_tmin, e_tmax, rh_min, rh_max):
 	"""
@@ -930,8 +923,8 @@ def sol_rad_from_t(et_rad, cs_rad, tmin, tmax, coastal=-999):
 	else:
 		# hedge our bets and give a mean adjustment values and issue a warning
 		adj = 0.175
-		print """WARNING! Location not specified as coastal or interior for
-		calculation of solar radiation. Using defalut adjustment factor."""
+		#print """WARNING! Location not specified as coastal or interior for
+		#calculation of solar radiation. Using defalut adjustment factor."""
 
 	solar_rad = adj * math.sqrt(tmax - tmin) * et_rad
 
@@ -1002,8 +995,15 @@ def wind_speed_2m(meas_ws, z):
 	ws2m = meas_ws * (4.87 / math.log(tmp1))
 	return ws2m
 #
-# Written By Suryakant Sawant
-# Verified
+# Written by : Suryakant Sawant
+# 
+def sat_vap_press(temp):
+	"""
+	Calculates saturated vapour pressure.
+	"""
+	e_temp = 0.6108 * math.exp((17.27*temp)/(temp+237.3))
+	return e_temp
+# 
 def dlHours(sha):
 	"""
 	Calculates day length in hours
@@ -1014,6 +1014,17 @@ def dlHours(sha):
 	dl_hours = (24/PI)*sha
 	return dl_hours
 #
+def getDoy(myDate):
+	"""
+	Calculates the day of year for given date
+	
+	Arguments:
+	myDate	- input date in some format (str) 
+	"""
+	myDate = dateutil.parser.parse(myDate)
+	myDate = myDate.strftime('%Y-%m-%d')
+	myDoy = datetime.datetime.strptime(myDate, '%Y-%m-%d').timetuple().tm_yday
+	return(myDoy)
 # TODO: add more solar related functions
 # e.g. Sunrise hour angle, sunset hour angle, etc.
-# 	 
+#

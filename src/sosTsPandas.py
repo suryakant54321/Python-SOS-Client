@@ -33,27 +33,28 @@ def tsOperation(message, data, operation='mean', sampleTime='24H'):
 	"""
 	operationSupport = ['sum', 'mean', 'max', 'median', 'min', 'count']
 	meanTsList = []
-	if operation.lower() in operationSupport: 
-		df = pd.DataFrame(data, columns=["dateTime", "val"]) # create dataframe
-		df['dateTime'] = pd.to_datetime(df['dateTime']) # convert data type of datetime
-		df.index = pd.to_datetime(df.dateTime) # assign index to dataframe
-		df['val'] = df.val.convert_objects(convert_numeric=True) # convert data type of temp column to numeric
-		#print(df.dtypes)# data type of dataframe varaibles
-		#print(df.resample(sampleTime, how = operation))
-		# perform operation on selected time series
-		if operation=='count' or operation=='mean':
-			df = df.loc[(df.val!=0)]
-			meanTs = df.resample(sampleTime, how = operation) 
+	if data != []:
+		if operation.lower() in operationSupport: 
+			df = pd.DataFrame(data, columns=["dateTime", "val"]) # create dataframe
+			df['dateTime'] = pd.to_datetime(df['dateTime']) # convert data type of datetime
+			df.index = pd.to_datetime(df.dateTime) # assign index to dataframe
+			df['val'] = df.val.convert_objects(convert_numeric=True) # convert data type of temp column to numeric
+			#print(df.dtypes)# data type of dataframe varaibles
+			#print(df.resample(sampleTime, how = operation))
+			# perform operation on selected time series
+			if operation=='count' or operation=='mean':
+				df = df.loc[(df.val!=0)]
+				meanTs = df.resample(sampleTime, how = operation) 
+			else:
+				meanTs = df.resample(sampleTime, how = operation)
+			meanTsCsv = meanTs.to_csv(columns=['val'])
+			meanTsCsv = meanTsCsv.rstrip('\n') 
+			meanTsList = re.split(',|\\n',meanTsCsv)
+			#
+			# using splitLst function to split list
+			meanTsList = splitLst(meanTsList, int(len(meanTsList)/2))
 		else:
-			meanTs = df.resample(sampleTime, how = operation)
-		meanTsCsv = meanTs.to_csv(columns=['val'])
-		meanTsCsv = meanTsCsv.rstrip('\n') 
-		meanTsList = re.split(',|\\n',meanTsCsv)
-		#
-		# using splitLst function to split list
-		meanTsList = splitLst(meanTsList, int(len(meanTsList)/2))
-	else:
-		print(Fore.RED+"invalid operation '"+operation+"' \n Returning empty list \n current support limited to mean, median, max, min, sum and count."+Fore.RESET)
+			print(Fore.RED+"invalid operation '"+operation+"' \n Returning empty list \n current support limited to mean, median, max, min, sum and count."+Fore.RESET)
 	return(meanTsList)
 #-----------------------------------------------------------------------
 def splitLst(splitL, lRank):
