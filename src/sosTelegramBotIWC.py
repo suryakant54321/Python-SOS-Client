@@ -40,7 +40,7 @@ def start(bot, update):
 	bot.sendMessage(update.message.chat_id, text=msgCont)
 # 1
 def help(bot, update):
-	msgCont = 'For more information enter following commands \n अधिक माहितीसाठी खाली दिलॆलॆ मेसेज पाठवा \n /whoami (मी कॊण आहॆ?) \n /whichSensors (हवामान केंद्राची अधिक माहिती.) \n /getTemp (Air Temperature हवेचे तापमान) \n /getHum (Relative Humidity हवेची सापेक्ष आद्रता) \n /getRain (Rainfall पर्जन्य))'
+	msgCont = 'For more information enter following commands \n अधिक माहितीसाठी खाली दिलॆलॆ मेसेज पाठवा \n /whoami (मी कॊण आहॆ?) \n /whichSensors (हवामान केंद्राची अधिक माहिती.) \n /getTemp (Air Temperature हवेचे तापमान) \n /getHum (Relative Humidity हवेची सापेक्ष आद्रता) \n /getRain (Rainfall पर्जन्य)\n /getRefET (daily grass / reference Evaporation + Transpiration \n    गवतावरील दैनिक बाष्पीभवन + पाणी वापर मोजणी) )'
 	bot.sendMessage(update.message.chat_id, text=msgCont)
 # 2
 def whoami(bot, update):
@@ -201,7 +201,63 @@ def query(bot, update):
 		# write file with user details
 		writeContent(fName, content)
 	bot.sendMessage(update.message.chat_id, text=da)
-#
+# 11
+def getRefET(bot, update):
+	dat = update.message
+	dat = dat.to_dict()
+	print(dat)
+	f_name = dat['from']['first_name']
+	l_name = dat['from']['last_name']
+	queryText = dat['text']
+	print(queryText)
+	qDate = datetime.datetime.fromtimestamp(dat['date'])
+	qDate = qDate.strftime('%Y-%m-%dT%H:%M:%S')
+	queryContent = re.split('/getRefET',queryText)
+	spaces = queryContent[1].replace(' ','')
+	import sosETCalc as et
+	da =u''
+	if queryContent[1] == u'' or spaces == u'':
+		obsETo = et.getRefET(url, getCapStr)
+		da = (u"Dear %s we received getRefET request without date. \n नमस्कार %s आपला  getRefET मुद्दा रीकामा मिळाला. \n ---- \n Calculated daily grass / reference evaporation + transpiration \n (गवतावरील दैनिक बाष्पीभवन + पाणी वापर मोजणी).\n")%(f_name, f_name)
+		if len(obsETo)>2:	
+			for i in range(len(obsETo)):
+				if i == 0:
+					da = da + str(obsETo[i][0]) + ', '+str(obsETo[i][1])+', '+str(obsETo[i][2])+'\n--\n'
+				else:
+					da = da + str(obsETo[i][0]) + ': '+str(obsETo[i][1])+', '+str(obsETo[i][2])+'\n--\n'
+			da = da + u"\n ---- \n To calculate for your requested date. (आपण सुचीत कॆलॆल्या दिनांकासाठी.) \n Send /getRefET 'dd-mm-YYYY' (पाठवा /getRefET 'दिवस-महीना-वर्ष').  \n----\n Send /help (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा)."
+		else:
+			da = da+ u"\n ---- \n Sorry, unable to calculate (माफ करा मोजणी करन्यास असमर्थ.) \n To return send (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा)."
+	elif spaces != u'':
+		validDate=""
+		try:
+			validDate = re.split('-',spaces)
+		except:
+			pass
+		if len(validDate)==3 and len(validDate[0])==2 and len(validDate[1])==2 and len(validDate[2])==4:
+			da = (u"Dear %s we received getRefET request with date. \n नमस्कार %s आपला  getRefET मुद्दा दिनांकासहीत मिळाला. \n ---- \n Calculated daily grass / reference evaporation + transpiration \n (गवतावरील दैनिक बाष्पीभवन + पाणी वापर मोजणी).\n")%(f_name, f_name)
+			myDate = str(spaces)
+			#print(myDate)
+			try:
+				obsETo = et.getRefET(url, getCapStr, myDate)
+				#print(obsETo)
+			except:
+				pass
+			if len(obsETo)>2:	
+				for i in range(len(obsETo)):
+					if i == 0:
+						da = da + str(obsETo[i][0]) + ', '+str(obsETo[i][1])+', '+str(obsETo[i][2])+'\n--\n'
+					else:
+						da = da + str(obsETo[i][0]) + ': '+str(obsETo[i][1])+', '+str(obsETo[i][2])+'\n--\n'
+				da = da + u"\n ---- \n To calculate for your requested date. (आपण सुचीत कॆलॆल्या दिनांकासाठी.) \n Send /getRefET 'dd-mm-YYYY' (पाठवा /getRefET 'दिवस-महीना-वर्ष').  \n----\n Send /help (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा)."
+			else:
+				da = da+ u"\n ---- \n Sorry, unable to calculate (माफ करा मोजणी करन्यास असमर्थ.) \n To return send (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा)."
+		else:
+			da = "Sorry, unable to calculate (माफ करा मोजणी करन्यास असमर्थ.) \n"		
+			da = da + "\n ---- \n Right format /getRefET 'dd-mm-YYYY' (यॊग्य मुद्दा प्रकार /getRefET 'दिवस-महीना-वर्ष').\n----\n Send /help (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा)."
+	else:
+		da = (u"%s I don't understand what ' %s ' means. \n %s मला समजलॆ नाही, ' %s ' आपण काय सांगू इच्छित आहात? \n To return send (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा).")%(f_name, spaces, f_name, spaces)
+	bot.sendMessage(update.message.chat_id, text=da)
 # Write utf-8 file content
 def writeContent(fName, content):
 	with open(fName,'a') as fout:
@@ -289,10 +345,11 @@ def main():
 	dp.add_handler(CommandHandler("getRain", getRain))
 	# Sending user query # 10
 	dp.add_handler(CommandHandler("query", query))
-
+	# Sending user query # 11
+	dp.add_handler(CommandHandler("getRefET", getRefET))
 
 	# to do add getET, irriSchedule,
-
+	
 	# on noncommand i.e message - echo the message on Telegram
 	dp.add_handler(MessageHandler([Filters.text], echo)) # a
 	dp.add_handler(MessageHandler([Filters.location], loc)) # b
