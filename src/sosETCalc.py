@@ -11,7 +11,10 @@
 #	sosParseCap
 #	sosParseGetObs
 # 	sosTsPandas
-# 
+# 	re
+#	dateutil
+#	datetime
+#
 # Note:
 # 	Lines marked with #** are hard coaded
 #-----------------------------------------------------------------------
@@ -23,7 +26,7 @@ import sosParseGetObs as go
 import sosTsPandas as st
 import re, os, dateutil, datetime
 #-----------------------------------------------------------------------
-global url, getCapStr
+#global url, getCapStr
 url = 'http://localhost/istsos/service'
 # Get capabilities string
 getCapStr = '?request=getCapabilities&section=contents&service=SOS'
@@ -32,7 +35,11 @@ def checkDate(inDate, trueEndTime, trueStartTime):
 	"""
 	Function to check the date entered by user is valid
 	
-	returns [str] TRUE / FALSE
+	Why?: Date entered should be available within 
+		observation dates (start and end)
+	
+	output/s:
+		dateCheck [str] TRUE / FALSE
 	"""
 	dateCheck = 'FALSE'
 	if inDate == 'None': 
@@ -60,25 +67,34 @@ def checkDate(inDate, trueEndTime, trueStartTime):
 				dateCheck = 'FALSE'
 	return(dateCheck)
 #
-def getAllObs(inDate='None'):
+def getRefET(url, getCapStr, inDate='None'):
 	"""
-	Steps:	
-		Get observations for one week 
-		Selected sensors (Temperature, Humidity, Rainfall, Wind Speed, Solar Radiation)
+	Function to get observations from SOS for one week 
 
-		TODO:
-		Process all observations for daily stats (i.e. mean, sum, max, min)
-		Unit conversions if any
-		
-		TODO (low priority): Get Observations for specified date/ week/ season
+		process sensor observations for reference evapotranspiration estimation
+
+		selected sensors (Temperature, Humidity, Wind Speed, Solar Radiation)
 
 	Input/s:
-		url [str]
-		
+		url [str] SOS url
+
+		getCapStr [str] Get Capabilities string
+
+		inDate [str] optional  format (dd-mm-YYYY)
+			if date is not specified default last observation date is considered 
+			  and observations for last 7 days are requested 
+			  from SOS and processed for ETo
+			
+			if date is specified observations for last 7 days are requested 
+			  from SOS and processed for ETo 		 
 
 	Output/s:
-		Observations [[str]]
+		ETo Observations [[str, str, str], [str, float, float], ...]
+
+			e.g. [['date', ETo_PM, ETo_Harg], ...]
 	"""
+	outETo = []
+	outETo.append(['date', 'ETo_PM', 'ETo_Harg'])
 	nUrl = url+getCapStr
 	# send Get Capabilities Request
 	out = pc.parseSOScap(nUrl)
@@ -86,7 +102,9 @@ def getAllObs(inDate='None'):
 	#print(out)
 	trueEndTime = out['timeEndPosition']
 	trueStartTime = out['timeBeginPosition']
+	#print(inDate)
 	dateCheck = checkDate(inDate, trueEndTime, trueStartTime)
+	#print(dateCheck)
 	if dateCheck == "FALSE": 
 		#
 		endTime = out['timeEndPosition']
@@ -101,6 +119,7 @@ def getAllObs(inDate='None'):
 			
 		except:
 			pass
+		#print(inDate)
 		endTime = dateutil.parser.parse(inDate, dayfirst='TRUE')
 		startTime = endTime-datetime.timedelta(days=7)
 		endTime = str(endTime.strftime('%Y-%m-%dT%H:%M:%S%z'))
@@ -139,6 +158,7 @@ def getAllObs(inDate='None'):
 	except:
 		pass
 	#
+	"""	
 	# 3. For rainfall (mm)
 	go.ISTSOSrparams['observedProperty'] = out['observedProperties'][4]# **
 	go.ISTSOSrparams['procedure'] = out['procedure'][3]# **
@@ -151,6 +171,7 @@ def getAllObs(inDate='None'):
 		#print(sumObsR,"\n Count is \n",countObsR)
 	except:
 		pass
+	"""
 	#
 	# 4. For Radiation (in W m-2)
 	go.ISTSOSrparams['observedProperty'] = out['observedProperties'][6] # **
@@ -187,8 +208,10 @@ def getAllObs(inDate='None'):
 	latLon = re.split(',', latLon)
 	myLat = float(latLon[0])
 	myLon = float(latLon[1])
+	etCalc = []
 	if minObsT !=[] and maxObsT != []:
 		for i in range(len(maxObsT)):
+			etCalc = []
 			if i != 0:	
 				# Date
 				myDate = str(maxObsT[i][0])
@@ -212,7 +235,7 @@ def getAllObs(inDate='None'):
 				RHMin = float(minObsH[i][1])
 				RHMax = float(maxObsH[i][1])
 				# sunshine duration (hours)
-				print(myDate, ws, maxT, minT, meanT, t, RHMin, RHMax)
+				#print(myDate, ws, maxT, minT, meanT, t, RHMin, RHMax)
 				#------------------------------------------------------------
 				# input altitude
 				press = et.atmos_pres(alt)
@@ -280,24 +303,36 @@ def getAllObs(inDate='None'):
 				Ra = et.rad2equiv_evap(et_rad)
 				# Harg. ETo
 				EToHarg = et.hargreaves_ETo(minT, maxT, meanT, Ra)
-				print(myDate, EToPM, EToHarg)
+				etCalc.append(myDate)
+				etCalc.append(EToPM)
+				etCalc.append(EToHarg)
+				outETo.append(etCalc)
+				#print(myDate, EToPM, EToHarg)
 				#"""
 	else:
-		print(('No observations available for dates between %s and %s')%(startTime, endTime))
+		outETo.append(etCalc)
+		#print(('No observations available for dates between %s and %s')%(startTime, endTime))
+	return(outETo)
 #
-def refEt():
+def getIrriSchedule():
 	"""
-	Calculate reference ET using PM or Hargreves method
+	Estimate irrigation schedule using crop water balance
 
 	Input/s:
 		
+		
 	Output/s:
 		
+				
 	"""
 #-----------------------------------------------------------------------
-getAllObs()
-getAllObs('10-12-2015')
-getAllObs('10-12-2014')
-getAllObs('10-12-2012')
-getAllObs('10-12-2011')
-
+# implementation
+"""
+print(getRefET(url, getCapStr))
+print(getRefET(url, getCapStr, '10-12-2015'))
+print(getRefET(url, getCapStr, '10-12-2014'))
+print(getRefET(url, getCapStr, '10-12-2012'))
+print(getRefET(url, getCapStr, '10-12-2013'))
+print(getRefET(url, getCapStr, '10-12-2019'))
+print(getRefET(url, getCapStr, '10-12-2011'))
+"""
