@@ -11,14 +11,7 @@
 # 2. Modified Echobot example (https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot2.py).
 # 3. Press Ctrl-C on the command line or send a signal to the process to stop the bot.
 # 4. User commands are processed for obtaining sensor capabilities, Observations and Measurements.
-#
-# To Do:
-# 1. Add more intearctive user commands 
-#	a. Sensor system list
-#	b. Sensor selection (temperature, humidity, etc.)
-#	c. Sensor observation listing
-#	d. Summary statistics of time series observation  
-# 2. Process output response using markup tags (HTML, etc.) 
+# 5. More functions are added in sosTelegramBotIWC.py
 #-----------------------------------------------------------------------
 """
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
@@ -98,8 +91,8 @@ def error(bot, update, error):
 	logger.warn('Update "%s" caused error "%s"' % (update, error))
 #
 def main():
-	# Add your bot's token here 
-	updater = Updater("TOKEN") 
+	# Add your bot's token here # KrishiSense: TOKEN
+	updater = Updater("TOKEN") # SenseTube: 
 
 	# Get the dispatcher to register handlers
 	dp = updater.dispatcher

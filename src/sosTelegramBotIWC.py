@@ -14,8 +14,7 @@
 # 3. Press Ctrl-C on the command line or send a signal to the process to stop the bot.
 # 4. User commands are processed for obtaining sensor capabilities, Observations and Measurements.
 #
-# To Do:
-# 1. Add more intearctive user commands 
+1. Add more intearctive user commands 
 #	a. Sensor system list
 #	b. Sensor selection (temperature, humidity, etc.)
 #	c. Sensor observation listing
