@@ -1,13 +1,13 @@
 # Python-SOS-Client
 Python Sensor Observation Service (SOS) Cilent
 
-- Python based parsers for parsing SOS response.
+- Python based parsers for SOS response.
 - Aimed for standalone operation mainly for SOS based Telegram Bot/s.
 - Integrates SOS parsers using [Telegram-Bot-Scripts] to [python-telegram-bot]. More information about [Telegram Bot Platform].
-
+- Added working use case for [IWC project].
 
 ### Version
-Alpha 1.0.0
+Alpha 2.0.0
 
 ### Depends on
 
@@ -39,6 +39,9 @@ Only tested in Ubuntu 14.04 with python 2.7
 	- sosTelegramBot.py (SOS integration with Telegram Bot, example1: English)
 	- sosTelegramBotMarathi.py (SOS integration with Telegram Bot, example2: English and Marathi)
 	- overallFlow.py (overall flow of all processes)
+	- fao_eto.py (core function to estiamte reference Evapotranspiration (ETo))
+	- sosETCalc.py (SOS based function to estimate ETo)
+	- sosTelegramBotIWC.py (SOS based use case for [IWC project])
 
 ### Advantages
 
@@ -89,12 +92,9 @@ C. Other SOS Clients
 
 
 #### To Do
-	
-1. Combine overall flow of all processes (i.e. SOS parsing and Telegram user interactions)
 
-2. Test all modules
-
-3. Write detailed documentation using [Sphinix] 
+1. Add irrigation scheduling component.
+2. Write detailed documentation using [Sphinix].
 
 
 [ISTSOS]: <http://istsos.org/>
@@ -111,3 +111,5 @@ C. Other SOS Clients
 [Telegram Bot Platform]: <https://telegram.org/blog/bot-revolution>
 [Telegram-Bot-Scripts]: <https://github.com/suryakant54321/Telegram-Bot-Scripts>
 [python-telegram-bot]: <https://github.com/python-telegram-bot/python-telegram-bot>
+[IWC project]: <http://itra.medialabasia.in/?p=623>
+
