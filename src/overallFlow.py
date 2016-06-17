@@ -1,7 +1,7 @@
 """
 #-----------------------------------------------------------------------
 # Author: Suryakant Sawant
-# Date: 22 May 2016
+# Date: 22 May 2016 >> 18 June 2016
 # Application Name: SOS-Telegram-Client
 #
 # Flow: 1. Get Capabilities (sosParseCap.py)	
@@ -12,18 +12,13 @@
 #		Status: Complete
 # 	4. Process Observations (sosParseGetObs.py)
 #		Status: Complete
-#	To Do:
-#	5. Compose and push message on Telegram bot (teleCompose.py)
-		bot get SOS URL/s (NDBC, ISTSOS, SenseTube, etc.)
-		bot GetCapabilities
-		bot DescribeSensor
-		bot GetObservation (raw csv)
-		bot GetObservation (processed mean, max, min, median, sum, etc.)
-		bot GetObservation (graph)
+#	5. Compose and push message on Telegram bot 
+#		Read help for each file sosTelegramBot.py, sosTelegramBotMarathi.py and sosTelegramBotIWC.py
+#		In short
+#			sosTelegramBot.py - sample example to utilize SOS capabilities
+# 			sosTelegramBotMarathi.py - sample example in multiple languages
+#			sosTelegramBotIWC.py -  specilized example for IWC project <http://itra.medialabasia.in/?p=623>
 #
-# Improvement/s
-# 	7. Receive commands from user on Telegram bot
-#	8. Execute process from (1 to 5)
 #-----------------------------------------------------------------------
 """
 # 1. Example of Get Capabilities and Get Observation Request
