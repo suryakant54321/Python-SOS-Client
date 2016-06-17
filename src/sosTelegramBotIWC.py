@@ -13,14 +13,21 @@
 # 2. Modified Echobot example (https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot2.py).
 # 3. Press Ctrl-C on the command line or send a signal to the process to stop the bot.
 # 4. User commands are processed for obtaining sensor capabilities, Observations and Measurements.
+# 5. Intearctive user commands include 
+#	a. Getting sensor observations using commands (/getTemp, /getHum, /getRain, etc.)
+#	b. Reference ET estimation using functions from sosETCalc.py 
+#	c. Telegram command for Reference ET estimation (/getRefET) 
+#	d. User query recorder using /query <query text>
+# 6. Support for response format in both English and Marathi Language
 #
-1. Add more intearctive user commands 
-#	a. Sensor system list
-#	b. Sensor selection (temperature, humidity, etc.)
-#	c. Sensor observation listing
-#	d. Summary statistics of time series observation  
-# 2. Process output response using markup tags (HTML, etc.) 
-# 3. Design response format in both English and Marathi Language
+# TODO:
+# 	a. Add database support for user query, pic/image upload and location
+#	b. Location based analysis using multi-modal sensor observations
+#
+# Note:
+#	This script is specific example designed for IWC project <http://itra.medialabasia.in/?p=623> 
+#
+# 	Lines marked with #** are hard coaded
 #-----------------------------------------------------------------------
 """
 #-----------------------------------------------------------------------
@@ -72,110 +79,155 @@ def getObs(bot, update):
 	bot.sendMessage(update.message.chat_id, text=out)
 # 7
 def getTemp(bot, update):
+	"""
+	Function to handle Get Temperature observations from AWS
+	
+		1. Processes get capabilities request 
+		   to know service parameters such as
+		   observed properties, procedure, observation updates 
+		   start and end time
+
+		2. Processes get observation request
+		   for sensor observations 
+		   calculates summary stat of sensor observations
+		   compile and send message response to user  
+	"""
 	import sosParseCap as pc
 	nUrl = url+getCapStr
 	out = pc.parseSOScap(nUrl)
 	out = out[0]
-	obsProp = out['observedProperties'][0]
-	offering = out['offering']
-	procedure = out['procedure'][6]
-	endTime = out['timeEndPosition']
+	obsProp = out['observedProperties'][0] #**
+	offering = out['offering'] #**
+	procedure = out['procedure'][6] #**
+	endTime = out['timeEndPosition'] #**
 	startTime = dateutil.parser.parse(endTime)
-	startTime = startTime-datetime.timedelta(days=7)
+	startTime = startTime-datetime.timedelta(days=7) #**
 	startTime = str(startTime.strftime('%Y-%m-%dT%H:%M:%S%z'))
 	# calling get observation function		
 	import sosParseGetObs as go
 	# assign details for request
-	go.ISTSOSrparams['eventTime'] = ("%s/%s")%(startTime, endTime)
-	go.ISTSOSrparams['observedProperty'] = obsProp
-	go.ISTSOSrparams['procedure'] = procedure
-	go.ISTSOSrparams['offering'] = offering
+	go.ISTSOSrparams['eventTime'] = ("%s/%s")%(startTime, endTime) #**
+	go.ISTSOSrparams['observedProperty'] = obsProp #**
+	go.ISTSOSrparams['procedure'] = procedure #**
+	go.ISTSOSrparams['offering'] = offering #**
 	aa, bb = go.parseSOSgetObs(url, go.ISTSOSrparams, responseFormat='json')
 	
 	msgOut = "Temperature (हवेचे तापमान) in degree Celsius \n \n"
 	# process output	
 	import sosTsPandas as st
-	minObs = st.tsOperation(aa, bb, operation='min', sampleTime='24H')
-	maxObs = st.tsOperation(aa, bb, operation='max', sampleTime='24H')
+	minObs = st.tsOperation(aa, bb, operation='min', sampleTime='24H') #**
+	maxObs = st.tsOperation(aa, bb, operation='max', sampleTime='24H') #**
 	if minObs !=[] and maxObs != []:
 		for i in range(len(maxObs)):
 			if i != 0:
-				msgOut = msgOut+'Date (तारिख): '+ str(minObs[i][0]) +', Min (किमान) = '+ str(minObs[i][1]) + ', Max (कमाल) = '+  str(maxObs[i][1]) +' \n'
+				msgOut = msgOut+'Date (तारिख): '+ str(minObs[i][0]) +', Min (किमान) = '+ str(minObs[i][1]) + ', Max (कमाल) = '+  str(maxObs[i][1]) +' \n' #**
 	else:
 		msgOut = msgOut + "Some problem (काही अंतर्गत समस्या)\n Retry after some time (काही वेळानंतर पुन्हा प्रयत्न करा)."
 	msgOut = msgOut + '\n To return send (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा.)'
 	bot.sendMessage(update.message.chat_id, text=msgOut)
 # 8
 def getHum(bot, update):
+	"""
+	Function to handle Get Humidity observations from AWS
+	
+		1. Processes get capabilities request 
+		   to know service parameters such as
+		   observed properties, procedure, observation updates 
+		   start and end time
+
+		2. Processes get observation request
+		   for sensor observations 
+		   calculates summary stat of sensor observations
+		   compile and send message response to user  
+	"""
 	import sosParseCap as pc
 	nUrl = url+getCapStr
 	out = pc.parseSOScap(nUrl)
 	out = out[0]
-	obsProp = out['observedProperties'][3]
-	offering = out['offering']
-	procedure = out['procedure'][2]
-	endTime = out['timeEndPosition']
+	obsProp = out['observedProperties'][3] #**
+	offering = out['offering'] #**
+	procedure = out['procedure'][2] #**
+	endTime = out['timeEndPosition'] #**
 	startTime = dateutil.parser.parse(endTime)
-	startTime = startTime-datetime.timedelta(days=7)
+	startTime = startTime-datetime.timedelta(days=7) #**
 	startTime = str(startTime.strftime('%Y-%m-%dT%H:%M:%S%z'))
 	# calling get observation function		
 	import sosParseGetObs as go
 	# assign details for request
-	go.ISTSOSrparams['eventTime'] = ("%s/%s")%(startTime, endTime)
-	go.ISTSOSrparams['observedProperty'] = obsProp
-	go.ISTSOSrparams['procedure'] = procedure
-	go.ISTSOSrparams['offering'] = offering
+	go.ISTSOSrparams['eventTime'] = ("%s/%s")%(startTime, endTime) #**
+	go.ISTSOSrparams['observedProperty'] = obsProp #**
+	go.ISTSOSrparams['procedure'] = procedure #**
+	go.ISTSOSrparams['offering'] = offering #**
 	aa, bb = go.parseSOSgetObs(url, go.ISTSOSrparams, responseFormat='json')
 	
 	msgOut = "Humidity (हवेची सापेक्ष आद्रता) in % \n \n"
 	# process output	
 	import sosTsPandas as st
-	minObs = st.tsOperation(aa, bb, operation='min', sampleTime='24H')
-	maxObs = st.tsOperation(aa, bb, operation='max', sampleTime='24H')
+	minObs = st.tsOperation(aa, bb, operation='min', sampleTime='24H') #**
+	maxObs = st.tsOperation(aa, bb, operation='max', sampleTime='24H') #**
 	if minObs !=[] and maxObs != []:
 		for i in range(len(maxObs)):
 			if i != 0:
-				msgOut = msgOut+'Date (तारिख): '+ str(minObs[i][0]) +', Min (किमान) = '+ str(minObs[i][1]) + ', Max (कमाल) = '+  str(maxObs[i][1]) +' \n'
+				msgOut = msgOut+'Date (तारिख): '+ str(minObs[i][0]) +', Min (किमान) = '+ str(minObs[i][1]) + ', Max (कमाल) = '+  str(maxObs[i][1]) +' \n' #**
 	else:
 		msgOut = msgOut + "Some problem (काही अंतर्गत समस्या)\n Retry after some time (काही वेळानंतर पुन्हा प्रयत्न करा)."
 	msgOut = msgOut + '\n To return send (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा.)'
 	bot.sendMessage(update.message.chat_id, text=msgOut)
 # 9
 def getRain(bot, update):
+	"""
+	Function to handle Get Rainfall observations from AWS
+	
+		1. Processes get capabilities request 
+		   to know service parameters such as
+		   observed properties, procedure, observation updates 
+		   start and end time
+
+		2. Processes get observation request
+		   for sensor observations 
+		   calculates summary stat of sensor observations
+		   compile and send message response to user  
+	"""
 	import sosParseCap as pc
 	nUrl = url+getCapStr
 	out = pc.parseSOScap(nUrl)
 	out = out[0]
-	obsProp = out['observedProperties'][4]
-	offering = out['offering']
-	procedure = out['procedure'][3]
-	endTime = out['timeEndPosition']
+	obsProp = out['observedProperties'][4] #**
+	offering = out['offering'] #**
+	procedure = out['procedure'][3] #**
+	endTime = out['timeEndPosition'] #**
 	startTime = dateutil.parser.parse(endTime)
-	startTime = startTime-datetime.timedelta(days=7)
+	startTime = startTime-datetime.timedelta(days=7) #**
 	startTime = str(startTime.strftime('%Y-%m-%dT%H:%M:%S%z'))
 	# calling get observation function		
 	import sosParseGetObs as go
 	# assign details for request
-	go.ISTSOSrparams['eventTime'] = ("%s/%s")%(startTime, endTime)
-	go.ISTSOSrparams['observedProperty'] = obsProp
-	go.ISTSOSrparams['procedure'] = procedure
-	go.ISTSOSrparams['offering'] = offering
+	go.ISTSOSrparams['eventTime'] = ("%s/%s")%(startTime, endTime) #**
+	go.ISTSOSrparams['observedProperty'] = obsProp #**
+	go.ISTSOSrparams['procedure'] = procedure #**
+	go.ISTSOSrparams['offering'] = offering #**
 	aa, bb = go.parseSOSgetObs(url, go.ISTSOSrparams, responseFormat='json')
 	
 	msgOut = "Rainfall (पर्जन्य) in mm \n \n"
 	# process output	
 	import sosTsPandas as st
-	sumObs = st.tsOperation(aa, bb, operation='sum', sampleTime='24H')
+	sumObs = st.tsOperation(aa, bb, operation='sum', sampleTime='24H') #**
 	if sumObs !=[]:
 		for i in range(len(sumObs)):
 			if i != 0:
-				msgOut =msgOut+'Date (तारिख): '+str(sumObs[i][0]) +', Total (एकूण) = '+ str(sumObs[i][1]) +'\n'
+				msgOut =msgOut+'Date (तारिख): '+str(sumObs[i][0]) +', Total (एकूण) = '+ str(sumObs[i][1]) +'\n' #**
 	else:
 		msgOut = msgOut + "Some problem (काही अंतर्गत समस्या)\n Retry after some time (काही वेळानंतर पुन्हा प्रयत्न करा)."
 	msgOut = msgOut + '\n To return send (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा.)'
 	bot.sendMessage(update.message.chat_id, text=msgOut)
 # 10
 def query(bot, update):
+	"""
+	Function to handle text based queries from bot users
+	
+		Reads the text entered by user and write in file. 
+		This is initial stage for user interaction.
+	"""
 	dat = update.message
 	dat = dat.to_dict()
 	print(dat)
@@ -202,6 +254,21 @@ def query(bot, update):
 	bot.sendMessage(update.message.chat_id, text=da)
 # 11
 def getRefET(bot, update):
+	"""
+	Function to handle get refernce Evapotranspiration (ETo) estimations using AWS observations
+	
+		1. Processes get capabilities request 
+		   to know service parameters such as
+		   observed properties, procedure, observation updates 
+		   start and end time
+
+		2. Processes get observation request
+		   for sensor observations 
+		   calculates summary stat of sensor observations
+		
+		3. Compute daily ETo using Hargreaves and Penman-Monteith method  
+		   compile and send message response to user  
+	"""
 	dat = update.message
 	dat = dat.to_dict()
 	print(dat)
@@ -217,14 +284,14 @@ def getRefET(bot, update):
 	da =u''
 	if queryContent[1] == u'' or spaces == u'':
 		obsETo = et.getRefET(url, getCapStr)
-		da = (u"Dear %s we received getRefET request without date. \n नमस्कार %s आपला  getRefET मुद्दा रीकामा मिळाला. \n ---- \n Calculated daily grass / reference evaporation + transpiration \n (गवतावरील दैनिक बाष्पीभवन + पाणी वापर मोजणी).\n")%(f_name, f_name)
+		da = (u"Dear %s we received getRefET request without date. \n नमस्कार %s आपला  getRefET मुद्दा रीकामा मिळाला. \n ---- \n Calculated daily grass / reference evaporation + transpiration \n (गवतावरील दैनिक बाष्पीभवन + पाणी वापर मोजणी).\n")%(f_name, f_name) #**
 		if len(obsETo)>2:	
 			for i in range(len(obsETo)):
 				if i == 0:
-					da = da + str(obsETo[i][0]) + ', '+str(obsETo[i][1])+', '+str(obsETo[i][2])+'\n--\n'
+					da = da + str(obsETo[i][0]) + ', '+str(obsETo[i][1])+', '+str(obsETo[i][2])+'\n--\n' #**
 				else:
-					da = da + str(obsETo[i][0]) + ': '+str(obsETo[i][1])+', '+str(obsETo[i][2])+'\n--\n'
-			da = da + u"\n ---- \n To calculate for your requested date. (आपण सुचीत कॆलॆल्या दिनांकासाठी.) \n Send /getRefET 'dd-mm-YYYY' (पाठवा /getRefET 'दिवस-महीना-वर्ष').  \n----\n Send /help (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा)."
+					da = da + str(obsETo[i][0]) + ': '+str(obsETo[i][1])+', '+str(obsETo[i][2])+'\n--\n' #**
+			da = da + u"\n ---- \n To calculate for your requested date. (आपण सुचीत कॆलॆल्या दिनांकासाठी.) \n Send /getRefET 'dd-mm-YYYY' (पाठवा /getRefET 'दिवस-महीना-वर्ष').  \n----\n Send /help (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा)." #**
 		else:
 			da = da+ u"\n ---- \n Sorry, unable to calculate (माफ करा मोजणी करन्यास असमर्थ.) \n To return send (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा)."
 	elif spaces != u'':
@@ -234,7 +301,7 @@ def getRefET(bot, update):
 		except:
 			pass
 		if len(validDate)==3 and len(validDate[0])==2 and len(validDate[1])==2 and len(validDate[2])==4:
-			da = (u"Dear %s we received getRefET request with date. \n नमस्कार %s आपला  getRefET मुद्दा दिनांकासहीत मिळाला. \n ---- \n Calculated daily grass / reference evaporation + transpiration \n (गवतावरील दैनिक बाष्पीभवन + पाणी वापर मोजणी).\n")%(f_name, f_name)
+			da = (u"Dear %s we received getRefET request with date. \n नमस्कार %s आपला  getRefET मुद्दा दिनांकासहीत मिळाला. \n ---- \n Calculated daily grass / reference evaporation + transpiration \n (गवतावरील दैनिक बाष्पीभवन + पाणी वापर मोजणी).\n")%(f_name, f_name) #**
 			myDate = str(spaces)
 			#print(myDate)
 			try:
@@ -245,12 +312,12 @@ def getRefET(bot, update):
 			if len(obsETo)>2:	
 				for i in range(len(obsETo)):
 					if i == 0:
-						da = da + str(obsETo[i][0]) + ', '+str(obsETo[i][1])+', '+str(obsETo[i][2])+'\n--\n'
+						da = da + str(obsETo[i][0]) + ', '+str(obsETo[i][1])+', '+str(obsETo[i][2])+'\n--\n' #**
 					else:
-						da = da + str(obsETo[i][0]) + ': '+str(obsETo[i][1])+', '+str(obsETo[i][2])+'\n--\n'
-				da = da + u"\n ---- \n To calculate for your requested date. (आपण सुचीत कॆलॆल्या दिनांकासाठी.) \n Send /getRefET 'dd-mm-YYYY' (पाठवा /getRefET 'दिवस-महीना-वर्ष').  \n----\n Send /help (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा)."
+						da = da + str(obsETo[i][0]) + ': '+str(obsETo[i][1])+', '+str(obsETo[i][2])+'\n--\n' #**
+				da = da + u"\n ---- \n To calculate for your requested date. (आपण सुचीत कॆलॆल्या दिनांकासाठी.) \n Send /getRefET 'dd-mm-YYYY' (पाठवा /getRefET 'दिवस-महीना-वर्ष').  \n----\n Send /help (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा)." #**
 			else:
-				da = da+ u"\n ---- \n Sorry, unable to calculate (माफ करा मोजणी करन्यास असमर्थ.) \n To return send (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा)."
+				da = da+ u"\n ---- \n Sorry, unable to calculate (माफ करा मोजणी करन्यास असमर्थ.) \n To return send (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा)." #**
 		else:
 			da = "Sorry, unable to calculate (माफ करा मोजणी करन्यास असमर्थ.) \n"		
 			da = da + "\n ---- \n Right format /getRefET 'dd-mm-YYYY' (यॊग्य मुद्दा प्रकार /getRefET 'दिवस-महीना-वर्ष').\n----\n Send /help (पाठीमागॆ जाण्यासाठी  /help मेसेज पाठवा)."
@@ -259,6 +326,9 @@ def getRefET(bot, update):
 	bot.sendMessage(update.message.chat_id, text=da)
 # Write utf-8 file content
 def writeContent(fName, content):
+	"""
+	Function to write text in utf-8 format
+	"""
 	with open(fName,'a') as fout:
     		writer = csv.writer(fout)    
     		for row in zip(*content.values()):
@@ -268,6 +338,9 @@ def writeContent(fName, content):
 #---------------------------------------------------------------------------------
 # a
 def echo(bot, update):
+	"""
+	Function to handle filter based text information provided by user
+	"""
 	#print(update.message)
 	dat = update.message
 	dat = dat.to_dict()
@@ -278,6 +351,9 @@ def echo(bot, update):
 	bot.sendMessage(update.message.chat_id, text=da)
 # b
 def loc(bot, update):
+	"""
+	Function to handle filter based location information provided by user
+	"""
 	#print(update.message)
 	dat = update.message
 	dat = dat.to_dict()
@@ -291,6 +367,9 @@ def loc(bot, update):
 	bot.sendMessage(update.message.chat_id, text=da)
 # c
 def pic(bot, update):
+	"""
+	Function to handle filter based image information provided by user
+	"""
 	#print(update.message)
 	dat = update.message
 	dat = dat.to_dict()
@@ -309,20 +388,20 @@ def pic(bot, update):
 def error(bot, update, error):
 	logger.warn('Update "%s" caused error "%s"' % (update, error))
 #---------------------------------------------------------------------------------
-# TODO: add function to process Reference Evapotranspiration ETo
-
+# TODO: add function to provide irrigation starategy
+#
 #---------------------------------------------------------------------------------
 #
 def main():
 	# Add your bot's token here
-	updater = Updater("TOKEN")
+	updater = Updater("TOKEN") 
 	global url, fName, getCapStr
-	url = 'http://localhost/istsos/service'
+	url = 'http://localhost/istsos/service' #**
 	# File to store user queries 
-	fName = 'userQuery.csv'
+	fName = 'userQuery.csv' #**
 	#TODO: 	Store user queries to database
 	# Get capabilities string
-	getCapStr = '?request=getCapabilities&section=contents&service=SOS'
+	getCapStr = '?request=getCapabilities&section=contents&service=SOS' 
 	# Get the dispatcher to register handlers
 	dp = updater.dispatcher
 
@@ -331,7 +410,6 @@ def main():
 	dp.add_handler(CommandHandler("help", help)) # 1
 	dp.add_handler(CommandHandler("whoami", whoami)) # 2
 	dp.add_handler(CommandHandler("morewhoami", morewhoami)) # 3
-	
 	dp.add_handler(CommandHandler("whichSensors", whichSensors)) #4
 
 	dp.add_handler(CommandHandler("ISTSOSCap", ISTSOSCap)) # 5 not used here

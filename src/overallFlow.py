@@ -13,11 +13,11 @@
 # 	4. Process Observations (sosParseGetObs.py)
 #		Status: Complete
 #	5. Compose and push message on Telegram bot 
-#		Read help for each file sosTelegramBot.py, sosTelegramBotMarathi.py and sosTelegramBotIWC.py
+#		read help for each file sosTelegramBot.py, sosTelegramBotMarathi.py and sosTelegramBotIWC.py
 #		In short
 #			sosTelegramBot.py - sample example to utilize SOS capabilities
 # 			sosTelegramBotMarathi.py - sample example in multiple languages
-#			sosTelegramBotIWC.py -  specilized example for IWC project <http://itra.medialabasia.in/?p=623>
+#			sosTelegramBotIWC.py -  specific example for IWC project <http://itra.medialabasia.in/?p=623>
 #
 #-----------------------------------------------------------------------
 """
