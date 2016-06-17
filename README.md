@@ -93,14 +93,15 @@ C. Other SOS Clients
 
 #### Snapshots
 
+
 ![Snapshot 1](https://raw.githubusercontent.com/suryakant54321/Python-SOS-Client/master/snapshots/Screenshot_KrishiSense_01.png)
-Format: ![Alt Text](url)
+
 
 ![Snapshot 2](https://raw.githubusercontent.com/suryakant54321/Python-SOS-Client/master/snapshots/Screenshot_KrishiSense_02.png)
-Format: ![Alt Text](url)
+
 
 ![Snapshot 3](https://raw.githubusercontent.com/suryakant54321/Python-SOS-Client/master/snapshots/Screenshot_KrishiSense_03.png)
-Format: ![Alt Text](url)
+
 
 #### TODO
 
