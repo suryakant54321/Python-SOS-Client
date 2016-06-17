@@ -91,7 +91,18 @@ C. Other SOS Clients
 - Refer [sos-js] a JavaScript library to browse, visualise, and access, data from an Open Geospatial Consortium (OGC) Sensor Observation Service (SOS). Designed by [52°North].
 
 
-#### To Do
+#### Snapshots
+
+![Snapshot 1](https://github.com/suryakant54321/Python-SOS-Client/snapshots/Screenshot_KrishiSense_01.png)
+Format: ![Alt Text](url)
+
+![Snapshot 2](https://github.com/suryakant54321/Python-SOS-Client/snapshots/Screenshot_KrishiSense_02.png)
+Format: ![Alt Text](url)
+
+![Snapshot 3](https://github.com/suryakant54321/Python-SOS-Client/snapshots/Screenshot_KrishiSense_03.png)
+Format: ![Alt Text](url)
+
+#### TODO
 
 1. Add irrigation scheduling component.
 2. Write detailed documentation using [Sphinix].
