@@ -5,7 +5,7 @@
 # Source Details: https://github.com/python-telegram-bot/python-telegram-bot/examples
 #
 # Modified by: Suryakant Sawant
-# Date: 13 Jan. 2016
+# Date: 13 Jan. 2017
 #
 # Objective: Basic example to connect Sensor Observation Service (SOS) to Telegram Messaging Bot
 #
