@@ -1,9 +1,11 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 #-----------------------------------------------------------------------
 # Source Details: https://github.com/python-telegram-bot/python-telegram-bot/examples
 #
 # Modified by: Suryakant Sawant
-# Date: 23 May 2016
+# Date: 13 Jan. 2016
 #
 # Objective: Basic example to connect Sensor Observation Service (SOS) to Telegram Messaging Bot
 #
@@ -26,7 +28,7 @@ def start(bot, update):
 	bot.sendMessage(update.message.chat_id, text=welcomeMsg)
 #
 def help(bot, update):
-	helpMsg = 'For more information enter following commands \n /whoami \n /getSOSUrls \n /ISTSOSCap '
+	helpMsg = 'For more information enter following commands \n /whoami \n /getSOSUrls \n /ISTSOSCap \n /picSend '
 	bot.sendMessage(update.message.chat_id, text=helpMsg)
 #
 def whoami(bot, update):
@@ -51,6 +53,17 @@ def getObs(bot, update):
 	out = out+ str(result)
 	out = out+"\n "
 	bot.sendMessage(update.message.chat_id, text=out)
+#
+def picSend(bot, update):
+	#print(update.message)
+	dat = update.message
+	dat = dat.to_dict()
+	print(dat)
+	f_name = dat['from']['first_name']
+	# Form reply message
+	da = ("%s image is received from you.\n We will come back to you soon with results/forward image to expert.")%(f_name)
+	#bot.sendMessage(update.message.chat_id, text=da)
+	bot.sendPhoto(update.message.chat_id, photo=open('<path to image file>/sample.jpg', 'rb'))
 #
 def echo(bot, update):
 	print(update.message.text)
@@ -103,6 +116,7 @@ def main():
 	dp.add_handler(CommandHandler("whoami", whoami))
 	dp.add_handler(CommandHandler("getSOSUrls", getSOSUrls))
 	dp.add_handler(CommandHandler("ISTSOSCap", ISTSOSCap))
+	dp.add_handler(CommandHandler("picSend", picSend))
 	dp.add_handler(CommandHandler("getObs", getObs))
 
 	# on noncommand i.e message - echo the message on Telegram
